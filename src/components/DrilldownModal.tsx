@@ -1,9 +1,12 @@
-import { X, TrendingUp, Users, DollarSign, Calendar } from 'lucide-react';
+import { X, TrendingUp, Users, DollarSign, Calendar, Filter, MapPin, User, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ProcessedData } from '@/types/data';
 import { formatCurrency } from '@/utils/dataProcessor';
+import { useAnalyticsStore } from '@/store/analyticsStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface DrilldownModalProps {
   isOpen: boolean;
@@ -12,6 +15,8 @@ interface DrilldownModalProps {
 }
 
 export function DrilldownModal({ isOpen, onClose, data }: DrilldownModalProps) {
+  const { filters, setFilters } = useAnalyticsStore();
+  
   if (data.length === 0) return null;
 
   const totals = data.reduce((acc, item) => ({
@@ -20,6 +25,31 @@ export function DrilldownModal({ isOpen, onClose, data }: DrilldownModalProps) {
     revenue: acc.revenue + item.totalRevenue,
     cancelled: acc.cancelled + item.totalCancelled,
   }), { classes: 0, attendance: 0, revenue: 0, cancelled: 0 });
+
+  const uniqueLocations = [...new Set(data.map(d => d.location))];
+  const uniqueTeachers = [...new Set(data.map(d => d.teacherName))];
+  const uniqueClasses = [...new Set(data.map(d => d.cleanedClass))];
+
+  const hasActiveFilters = filters.dateRange.start || filters.dateRange.end || 
+    filters.locations.length > 0 || filters.teachers.length > 0 || 
+    filters.classes.length > 0 || filters.textSearch;
+
+  const applyQuickFilter = (type: 'location' | 'teacher' | 'class', value: string) => {
+    const newFilters = { ...filters };
+    switch (type) {
+      case 'location':
+        newFilters.locations = [value];
+        break;
+      case 'teacher':
+        newFilters.teachers = [value];
+        break;
+      case 'class':
+        newFilters.classes = [value];
+        break;
+    }
+    setFilters(newFilters);
+    onClose();
+  };
 
   const avgAttendance = totals.classes > 0 ? totals.attendance / totals.classes : 0;
   const fillRate = totals.classes > 0 && data[0].capacity ? (avgAttendance / data[0].capacity) * 100 : 0;
@@ -37,6 +67,112 @@ export function DrilldownModal({ isOpen, onClose, data }: DrilldownModalProps) {
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Active Filters */}
+          {hasActiveFilters && (
+            <div className="p-3 bg-accent/10 border border-accent/30 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Filter className="w-4 h-4 text-accent" />
+                <span className="text-sm font-semibold">Active Filters:</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {filters.dateRange.start && (
+                  <Badge variant="secondary" className="text-xs">
+                    From: {filters.dateRange.start}
+                  </Badge>
+                )}
+                {filters.dateRange.end && (
+                  <Badge variant="secondary" className="text-xs">
+                    To: {filters.dateRange.end}
+                  </Badge>
+                )}
+                {filters.locations.map(loc => (
+                  <Badge key={loc} variant="secondary" className="text-xs">
+                    📍 {loc}
+                  </Badge>
+                ))}
+                {filters.teachers.map(t => (
+                  <Badge key={t} variant="secondary" className="text-xs">
+                    👤 {t}
+                  </Badge>
+                ))}
+                {filters.classes.map(c => (
+                  <Badge key={c} variant="secondary" className="text-xs">
+                    📚 {c}
+                  </Badge>
+                ))}
+                {filters.textSearch && (
+                  <Badge variant="secondary" className="text-xs">
+                    🔍 "{filters.textSearch}"
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Quick Filter Buttons */}
+          <div className="space-y-3">
+            {uniqueLocations.length > 1 && (
+              <div>
+                <p className="text-xs font-semibold mb-2 flex items-center gap-2">
+                  <MapPin className="w-3 h-3" /> Filter by Location:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {uniqueLocations.map(loc => (
+                    <Button
+                      key={loc}
+                      size="sm"
+                      variant="outline"
+                      onClick={() => applyQuickFilter('location', loc)}
+                      className="text-xs"
+                    >
+                      {loc}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {uniqueTeachers.length > 1 && (
+              <div>
+                <p className="text-xs font-semibold mb-2 flex items-center gap-2">
+                  <User className="w-3 h-3" /> Filter by Teacher:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {uniqueTeachers.map(teacher => (
+                    <Button
+                      key={teacher}
+                      size="sm"
+                      variant="outline"
+                      onClick={() => applyQuickFilter('teacher', teacher)}
+                      className="text-xs"
+                    >
+                      {teacher}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {uniqueClasses.length > 1 && (
+              <div>
+                <p className="text-xs font-semibold mb-2 flex items-center gap-2">
+                  <BookOpen className="w-3 h-3" /> Filter by Class:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {uniqueClasses.map(cls => (
+                    <Button
+                      key={cls}
+                      size="sm"
+                      variant="outline"
+                      onClick={() => applyQuickFilter('class', cls)}
+                      className="text-xs"
+                    >
+                      {cls}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Summary Cards */}
           <div className="grid grid-cols-4 gap-4">
             <motion.div

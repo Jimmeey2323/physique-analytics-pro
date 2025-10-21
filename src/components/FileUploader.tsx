@@ -82,14 +82,16 @@ export function FileUploader() {
             <p className="text-sm text-muted-foreground">Parsing and normalizing class records</p>
           </div>
         ) : uploadedFile ? (
-          <div className="flex flex-col items-center gap-4">
-            <FileCheck className="w-16 h-16 text-success" />
-            <div>
-              <p className="text-lg font-semibold text-success">File uploaded successfully!</p>
-              <p className="text-sm text-muted-foreground mt-1">{uploadedFile}</p>
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3">
+              <FileCheck className="w-8 h-8 text-success" />
+              <div>
+                <p className="font-semibold text-success">File uploaded successfully</p>
+                <p className="text-xs text-muted-foreground">{uploadedFile}</p>
+              </div>
             </div>
-            <label className="btn-accent px-6 py-3 cursor-pointer mt-2">
-              Upload Different File
+            <label className="btn-accent px-4 py-2 cursor-pointer text-sm">
+              Upload New File
               <input
                 type="file"
                 accept=".zip,.csv"

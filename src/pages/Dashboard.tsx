@@ -64,10 +64,10 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-[1600px] mx-auto px-6 py-8 space-y-8">
-        {/* File Uploader */}
-        {individualClasses.length === 0 && (
-          <section>
-            <FileUploader />
+        {/* File Uploader - Always visible but compact after upload */}
+        <section>
+          <FileUploader />
+          {individualClasses.length === 0 && (
             <div className="mt-8 p-6 bg-accent/5 border border-accent/20 rounded-lg">
               <div className="flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
@@ -82,8 +82,8 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* Dashboard Content */}
         {individualClasses.length > 0 && (
@@ -142,12 +142,6 @@ export default function Dashboard() {
                   setIsDrilldownOpen(true);
                 }}
               />
-            </section>
-
-            {/* Upload New File */}
-            <section>
-              <h2 className="text-2xl font-bold mb-4">Upload New Data</h2>
-              <FileUploader />
             </section>
           </>
         )}

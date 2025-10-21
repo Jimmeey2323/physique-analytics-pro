@@ -152,6 +152,23 @@ export function AnalyticsTable({
       totalNonPaid: 0
     });
   }, [groupedData]);
+  const getGroupLabel = (group: GroupedData): string => {
+    switch (selectedGrouping) {
+      case 'location': return group.location;
+      case 'teacherName': return group.teacherName;
+      case 'teacherEmail': return group.teacherEmail;
+      case 'dayOfWeek': return group.dayOfWeek;
+      case 'classTime': return group.classTime;
+      case 'period': return group.period;
+      case 'day-time-class-teacher': return `${group.dayOfWeek} ${group.classTime} - ${group.cleanedClass} - ${group.teacherName}`;
+      case 'day-time-class': return `${group.dayOfWeek} ${group.classTime} - ${group.cleanedClass}`;
+      case 'teacher-class': return `${group.teacherName} - ${group.cleanedClass}`;
+      case 'location-class': return `${group.location} - ${group.cleanedClass}`;
+      case 'time-class': return `${group.classTime} - ${group.cleanedClass}`;
+      default: return group.cleanedClass;
+    }
+  };
+
   const toggleGroup = (key: string) => {
     const newExpanded = new Set(expandedGroups);
     if (newExpanded.has(key)) {
@@ -197,24 +214,24 @@ export function AnalyticsTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="gradient-navy text-white text-xs uppercase tracking-wider h-10">
-              <th className="px-4 text-left font-bold">Group</th>
-              <th className="px-4 text-left font-bold">Location</th>
-              <th className="px-4 text-left font-bold">Day</th>
-              <th className="px-4 text-left font-bold">Time</th>
-              <th className="px-4 text-left font-bold">Teacher</th>
-              <th className="px-3 text-right font-bold">Classes</th>
-              <th className="px-3 text-right font-bold">Empty</th>
-              <th className="px-3 text-right font-bold">Non-Empty</th>
-              <th className="px-3 text-right font-bold">Bookings</th>
-              <th className="px-3 text-right font-bold">Capacity</th>
-              <th className="px-3 text-right font-bold">Fill%</th>
-              <th className="px-3 text-right font-bold">Late Cancel</th>
-              <th className="px-3 text-right font-bold">Non-Paid</th>
-              <th className="text-right font-bold px-[2px] py-[2px] min-w-24">Avg w/ Empty</th>
-              <th className="px-3 text-right font-bold">Avg w/o Empty</th>
-              <th className="px-3 text-right font-bold">Revenue</th>
-              <th className="px-3 text-right font-bold">Cancel%</th>
-              <th className="px-3 text-center font-bold">Actions</th>
+              <th className="px-4 text-left font-bold whitespace-nowrap">Group</th>
+              <th className="px-4 text-left font-bold whitespace-nowrap">Location</th>
+              <th className="px-4 text-left font-bold whitespace-nowrap">Day</th>
+              <th className="px-4 text-left font-bold whitespace-nowrap">Time</th>
+              <th className="px-4 text-left font-bold whitespace-nowrap">Teacher</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Classes</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Empty</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Non-Empty</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Bookings</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Capacity</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Fill%</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Late Cancel</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Non-Paid</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Avg w/ Empty</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Avg w/o Empty</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Revenue</th>
+              <th className="px-3 text-right font-bold whitespace-nowrap">Cancel%</th>
+              <th className="px-3 text-center font-bold whitespace-nowrap">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -225,22 +242,22 @@ export function AnalyticsTable({
           }} transition={{
             delay: idx * 0.02
           }} className="border-b border-border hover:bg-table-row-hover transition-colors h-10 max-h-10">
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 whitespace-nowrap">
                   <button onClick={() => toggleGroup(group.groupKey!)} className="flex items-center gap-2 hover:text-accent transition-colors font-medium">
                     {expandedGroups.has(group.groupKey!) ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                    <span className="truncate max-w-xs">{group.cleanedClass}</span>
+                    <span className="whitespace-nowrap">{getGroupLabel(group)}</span>
                   </button>
                 </td>
-                <td className="py-1 text-muted-foreground text-nowrap my-0 px-2 min-w-56">{group.location}</td>
-                <td className="px-4 py-2 text-muted-foreground">{group.dayOfWeek}</td>
-                <td className="text-muted-foreground px-[2px] py-[2px] min-w-24">{group.classTime}</td>
-                <td className="px-4 py-2 text-muted-foreground truncate max-w-xs">{group.teacherName}</td>
-                <td className="px-3 py-2 text-right font-semibold">{group.totalOccurrences}</td>
-                <td className="px-3 py-2 text-right text-destructive">{group.totalEmpty}</td>
-                <td className="px-3 py-2 text-right text-success">{group.totalNonEmpty}</td>
-                <td className="px-3 py-2 text-right font-semibold">{group.totalCheckins}</td>
-                <td className="px-3 py-2 text-right">{group.capacity || '-'}</td>
-                <td className="px-3 py-2 text-right">
+                <td className="px-4 py-2 text-muted-foreground whitespace-nowrap">{group.location}</td>
+                <td className="px-4 py-2 text-muted-foreground whitespace-nowrap">{group.dayOfWeek}</td>
+                <td className="px-4 py-2 text-muted-foreground whitespace-nowrap">{group.classTime}</td>
+                <td className="px-4 py-2 text-muted-foreground whitespace-nowrap">{group.teacherName}</td>
+                <td className="px-3 py-2 text-right font-semibold whitespace-nowrap">{group.totalOccurrences}</td>
+                <td className="px-3 py-2 text-right text-destructive whitespace-nowrap">{group.totalEmpty}</td>
+                <td className="px-3 py-2 text-right text-success whitespace-nowrap">{group.totalNonEmpty}</td>
+                <td className="px-3 py-2 text-right font-semibold whitespace-nowrap">{group.totalCheckins}</td>
+                <td className="px-3 py-2 text-right whitespace-nowrap">{group.capacity || '-'}</td>
+                <td className="px-3 py-2 text-right whitespace-nowrap">
                   <span className={`
                     px-2 py-0.5 rounded text-xs font-semibold
                     ${group.fillRate! > 80 ? 'bg-success/20 text-success' : group.fillRate! > 50 ? 'bg-warning/20 text-warning' : 'bg-destructive/20 text-destructive'}
@@ -248,12 +265,12 @@ export function AnalyticsTable({
                     {group.fillRate!.toFixed(0)}%
                   </span>
                 </td>
-                <td className="px-3 py-2 text-right text-destructive">{group.totalCancelled}</td>
-                <td className="px-3 py-2 text-right text-muted-foreground">{group.totalNonPaid}</td>
-                <td className="px-3 py-2 text-right font-medium">{group.classAverageIncludingEmpty.toFixed(1)}</td>
-                <td className="px-3 py-2 text-right font-medium">{group.classAverageExcludingEmpty.toFixed(1)}</td>
-                <td className="px-3 py-2 text-right font-semibold text-success">{formatCurrency(group.totalRevenue, true)}</td>
-                <td className="px-3 py-2 text-right">
+                <td className="px-3 py-2 text-right text-destructive whitespace-nowrap">{group.totalCancelled}</td>
+                <td className="px-3 py-2 text-right text-muted-foreground whitespace-nowrap">{group.totalNonPaid}</td>
+                <td className="px-3 py-2 text-right font-medium whitespace-nowrap">{group.classAverageIncludingEmpty.toFixed(1)}</td>
+                <td className="px-3 py-2 text-right font-medium whitespace-nowrap">{group.classAverageExcludingEmpty.toFixed(1)}</td>
+                <td className="px-3 py-2 text-right font-semibold text-success whitespace-nowrap">{formatCurrency(group.totalRevenue, true)}</td>
+                <td className="px-3 py-2 text-right whitespace-nowrap">
                   <span className="text-xs">{group.lateCancellationRate!.toFixed(1)}%</span>
                 </td>
                 <td className="px-3 py-2 text-center">
