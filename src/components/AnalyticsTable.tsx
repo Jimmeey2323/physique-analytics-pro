@@ -12,7 +12,7 @@ interface AnalyticsTableProps {
 }
 
 export function AnalyticsTable({ onDrilldown }: AnalyticsTableProps) {
-  const { aggregatedData, filters, selectedGrouping, setSelectedGrouping } = useAnalyticsStore();
+  const { individualClasses, filters, selectedGrouping, setSelectedGrouping } = useAnalyticsStore();
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   const groupingOptions: { value: GroupingOption; label: string }[] = [
@@ -31,14 +31,14 @@ export function AnalyticsTable({ onDrilldown }: AnalyticsTableProps) {
   ];
 
   const filteredData = useMemo(() => {
-    return aggregatedData.filter(item => {
+    return individualClasses.filter(item => {
       if (filters.dateRange.start && item.date < filters.dateRange.start) return false;
       if (filters.dateRange.end && item.date > filters.dateRange.end) return false;
       if (filters.locations.length && !filters.locations.includes(item.location)) return false;
       if (filters.teachers.length && !filters.teachers.includes(item.teacherName)) return false;
       if (filters.classes.length && !filters.classes.includes(item.cleanedClass)) return false;
-      if (filters.minAttendance !== null && item.classAverageIncludingEmpty < filters.minAttendance) return false;
-      if (filters.maxAttendance !== null && item.classAverageIncludingEmpty > filters.maxAttendance) return false;
+      if (filters.minAttendance !== null && item.totalCheckins < filters.minAttendance) return false;
+      if (filters.maxAttendance !== null && item.totalCheckins > filters.maxAttendance) return false;
       if (filters.minRevenue !== null && item.totalRevenue < filters.minRevenue) return false;
       if (filters.maxRevenue !== null && item.totalRevenue > filters.maxRevenue) return false;
       if (filters.textSearch) {
@@ -51,7 +51,7 @@ export function AnalyticsTable({ onDrilldown }: AnalyticsTableProps) {
       }
       return true;
     });
-  }, [aggregatedData, filters]);
+  }, [individualClasses, filters]);
 
   const groupedData = useMemo(() => {
     const groups = new Map<string, ProcessedData[]>();
