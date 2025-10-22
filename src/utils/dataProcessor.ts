@@ -50,6 +50,26 @@ export function getCleanedClass(sessionNameRaw: string): string {
   return sessionNameRaw.trim();
 }
 
+export function getCleanedLocation(raw: string): string {
+  const s = toLowerTrim(raw);
+  if (!s) return 'Unknown';
+  const compact = s.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  const has = (w: string) => compact.includes(w);
+
+  // Supreme HQ, Bandra variants
+  if ((has('supreme') && has('bandra')) || has('supreme hq')) {
+    return 'Supreme HQ, Bandra';
+  }
+
+  // Kwality House, Kemps Corner variants
+  if (has('kwality') && (has('kemps') || has('kemp') || compact.includes('kemps corner'))) {
+    return 'Kwality House, Kemps Corner';
+  }
+
+  // Fallback to trimmed original casing
+  return String(raw || '').trim();
+}
+
 function parseDateTime(raw: string): { iso: string | null, time: string, dateStr: string, dayOfWeek: string, period: string } {
   let dt: DateTime | null = null;
   const parts = String(raw || '').split(',').map(p => p.trim());
@@ -86,7 +106,8 @@ export function processRawData(rawData: RawDataRow[]) {
       const teacherEmail = row['Teacher Email'] || row['teacher email'] || '';
       const classNameRaw = row['Class name'] || row['Class Name'] || row['class name'] || '';
       const classDateRaw = row['Class date'] || row['Class Date'] || '';
-      const location = String(row['Location'] || row['location'] || 'Unknown').trim();
+      const locationRaw = row['Location'] || row['location'] || 'Unknown';
+      const location = getCleanedLocation(String(locationRaw));
       const totalTime = safeNumber(row['Total time (h)'] || row['Time (h)'] || row['Time'] || 0);
 
       const checkedIn = row['Checked in'] ? (String(row['Checked in']).toLowerCase().startsWith('y') ? 1 : safeNumber(row['Checked in'])) : 0;
