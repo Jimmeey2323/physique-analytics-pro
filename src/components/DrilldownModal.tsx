@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ProcessedData } from '@/types/data';
 import { formatCurrency } from '@/utils/dataProcessor';
 import { useAnalyticsStore } from '@/store/analyticsStore';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -64,6 +64,9 @@ export function DrilldownModal({ isOpen, onClose, data }: DrilldownModalProps) {
           <DialogTitle className="text-2xl font-bold gradient-navy text-white p-4 -m-6 mb-4">
             Detailed Class Analytics
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            View detailed analytics and metrics for the selected group of classes
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">

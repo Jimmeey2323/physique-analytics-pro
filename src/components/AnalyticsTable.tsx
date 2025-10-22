@@ -60,7 +60,8 @@ export function AnalyticsTable({
     label: 'Time + Class'
   }];
   const filteredData = useMemo(() => {
-    return individualClasses.filter(item => {
+    const filtered = individualClasses.filter(item => {
+      // Date filtering - using Class date (item.date is from 'Class date' column, not 'Sale Date')
       if (filters.dateRange.start && item.date < filters.dateRange.start) return false;
       if (filters.dateRange.end && item.date > filters.dateRange.end) return false;
       if (filters.locations.length && !filters.locations.includes(item.location)) return false;
@@ -76,6 +77,15 @@ export function AnalyticsTable({
       }
       return true;
     });
+    
+    console.log('Date Range Filter:', filters.dateRange);
+    console.log('Total individual classes:', individualClasses.length);
+    console.log('Filtered classes:', filtered.length);
+    if (filters.dateRange.start || filters.dateRange.end) {
+      console.log('Sample dates from data:', individualClasses.slice(0, 5).map(c => ({ date: c.date, class: c.cleanedClass })));
+    }
+    
+    return filtered;
   }, [individualClasses, filters]);
   const groupedData = useMemo(() => {
     const groups = new Map<string, ProcessedData[]>();

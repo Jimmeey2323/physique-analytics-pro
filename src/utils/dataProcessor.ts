@@ -86,7 +86,7 @@ export function processRawData(rawData: RawDataRow[]) {
       const teacherEmail = row['Teacher Email'] || row['teacher email'] || '';
       const classNameRaw = row['Class name'] || row['Class Name'] || row['class name'] || '';
       const classDateRaw = row['Class date'] || row['Class Date'] || '';
-      const location = row['Location'] || row['location'] || 'Unknown';
+      const location = String(row['Location'] || row['location'] || 'Unknown').trim();
       const totalTime = safeNumber(row['Total time (h)'] || row['Time (h)'] || row['Time'] || 0);
 
       const checkedIn = row['Checked in'] ? (String(row['Checked in']).toLowerCase().startsWith('y') ? 1 : safeNumber(row['Checked in'])) : 0;
