@@ -95,8 +95,11 @@ function parseDateTime(raw: string): { iso: string | null, time: string, dateStr
 }
 
 export function processRawData(rawData: RawDataRow[]) {
+  console.log('🔍 Starting processRawData with', rawData.length, 'raw rows');
+  
   const processedDataMap = new Map<string, ProcessedData>();
   const individualClasses: ProcessedData[] = [];
+  const locationSet = new Set<string>();
 
   rawData.forEach((row, idx) => {
     try {
@@ -108,6 +111,7 @@ export function processRawData(rawData: RawDataRow[]) {
       const classDateRaw = row['Class date'] || row['Class Date'] || '';
       const locationRaw = row['Location'] || row['location'] || 'Unknown';
       const location = getCleanedLocation(String(locationRaw));
+      locationSet.add(location);
       const totalTime = safeNumber(row['Total time (h)'] || row['Time (h)'] || row['Time'] || 0);
 
       const checkedIn = row['Checked in'] ? (String(row['Checked in']).toLowerCase().startsWith('y') ? 1 : safeNumber(row['Checked in'])) : 0;
@@ -173,6 +177,10 @@ export function processRawData(rawData: RawDataRow[]) {
     }
   });
 
+  console.log('📊 Processed', individualClasses.length, 'individual class records');
+  console.log('📍 Unique locations found:', Array.from(locationSet));
+  console.log('📦 Aggregated groups:', processedDataMap.size);
+
   const aggregated = Array.from(processedDataMap.values()).map(rec => {
     rec.classAverageIncludingEmpty = rec.totalOccurrences > 0 ? Number((rec.totalCheckins / rec.totalOccurrences).toFixed(1)) : 0;
     rec.classAverageExcludingEmpty = rec.totalNonEmpty > 0 ? Number((rec.totalCheckins / rec.totalNonEmpty).toFixed(1)) : 0;
@@ -206,9 +214,12 @@ export async function parseZipFile(file: File): Promise<RawDataRow[]> {
       skipEmptyLines: true,
       transformHeader: (header) => header.trim(),
       complete: (results) => {
+        console.log('✅ CSV parsed:', results.data.length, 'rows');
+        console.log('📋 Sample row:', results.data[0]);
         resolve(results.data as RawDataRow[]);
       },
       error: (error) => {
+        console.error('❌ CSV parse error:', error);
         reject(error);
       },
     });
@@ -216,15 +227,19 @@ export async function parseZipFile(file: File): Promise<RawDataRow[]> {
 }
 
 export async function parseCSVFile(file: File): Promise<RawDataRow[]> {
+  console.log('📁 Parsing CSV file:', file.name, 'Size:', (file.size / 1024).toFixed(2), 'KB');
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
       transformHeader: (header) => header.trim(),
       complete: (results) => {
+        console.log('✅ CSV parsed:', results.data.length, 'rows');
+        console.log('📋 Sample row:', results.data[0]);
         resolve(results.data as RawDataRow[]);
       },
       error: (error) => {
+        console.error('❌ CSV parse error:', error);
         reject(error);
       },
     });
