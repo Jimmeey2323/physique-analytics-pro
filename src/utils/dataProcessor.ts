@@ -57,12 +57,12 @@ export function getCleanedLocation(raw: string): string {
   const has = (w: string) => compact.includes(w);
 
   // Supreme HQ, Bandra variants
-  if ((has('supreme') && has('bandra')) || has('supreme hq')) {
+  if ((has('supreme') && has('bandra')) || has('hq')) {
     return 'Supreme HQ, Bandra';
   }
 
   // Kwality House, Kemps Corner variants
-  if (has('kwality') && (has('kemps') || has('kemp') || compact.includes('kemps corner'))) {
+  if (has('kwality') && (has('kemps') || has('kwality') || compact.includes('kemps corner'))) {
     return 'Kwality House, Kemps Corner';
   }
 
@@ -114,9 +114,9 @@ export function processRawData(rawData: RawDataRow[]) {
       locationSet.add(location);
       const totalTime = safeNumber(row['Total time (h)'] || row['Time (h)'] || row['Time'] || 0);
 
-      const checkedIn = row['Checked in'] ? (String(row['Checked in']).toLowerCase().startsWith('y') ? 1 : safeNumber(row['Checked in'])) : 0;
+      const checkedIn = row['Checked in'] ? (String(row['Checked in']).toLowerCase().startsWith('Y') ? 1 : safeNumber(row['Checked in'])) : 0;
       const comp = safeNumber(row['Comp'] || row['Comps'] || row['Checked In Comps']);
-      const lateCancelled = row['Late Cancelled'] || row['Late cancellations'] || row['late cancellations'] ? safeNumber(row['Late Cancelled'] || row['Late cancellations']) : 0;
+      const lateCancelled = row['Late Cancelled'] || row['Late cancellations'] || ;
       const paid = safeNumber(row['Paid'] || row['Paid Amount'] || row['Total Revenue'] || row['Paid']);
 
       const cleanedClass = getCleanedClass(classNameRaw);
